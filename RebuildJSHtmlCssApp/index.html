@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resurgent City v8.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-sidebar">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Resurgent City v8.0</h2>
+
+            <div class="bg-gray-100 p-4 rounded-xl shadow-inner mb-6">
+                <h3 class="text-xl font-semibold text-gray-700 mb-3">Game Stats 📊</h3>
+                <p class="text-lg mb-1"><span class="game-stats-item" data-stat-id="day">Day: <span id="stat-day" class="font-bold text-blue-700">1</span></span></p>
+                <p class="text-lg mb-1"><span class="game-stats-item" data-stat-id="survivors">Survivors: <span id="stat-survivors-count" class="font-bold text-green-700">5</span> / <span id="stat-max-survivors" class="font-bold text-green-700">5</span></span></p>
+                <p class="text-lg mb-1"><span class="game-stats-item" data-stat-id="food">Food: <span id="stat-food" class="font-bold text-yellow-700">50</span></span></p>
+                <p class="text-lg mb-1"><span class="game-stats-item" data-stat-id="materials">Materials: <span id="stat-materials" class="font-bold text-red-700">30</span></span></p>
+                <p class="text-lg mb-1"><span class="game-stats-item" data-stat-id="research-points">Research Points: <span id="stat-research-points" class="font-bold text-purple-700">0</span></span></p>
+                <p class="text-lg mb-1"><span class="game-stats-item" data-stat-id="fort-defense">Fort Defense: <span id="stat-fort-defense" class="font-bold text-purple-700">10</span></span></p>
+                <p class="text-lg mb-1"><span class="game-stats-item" data-stat-id="food-production">Food Production: <span id="stat-food-production" class="font-bold text-yellow-600">0</span></span></p>
+                <p class="text-lg mb-1"><span class="game-stats-item" data-stat-id="materials-production">Materials Production: <span id="stat-materials-production" class="font-bold text-red-600">0</span></span></p>
+                <p class="text-lg mb-1"><span class="game-stats-item" data-stat-id="shelter-quality">Shelter Quality: <span id="stat-shelter-quality" class="font-bold text-blue-500">Good</span></span></p>
+                <p class="text-lg mb-1"><span class="game-stats-item" data-stat-id="medical-care">Medical Care: <span id="stat-medical-care" class="font-bold text-red-500">Poor</span></span></p>
+                <p class="text-lg mb-1"><span class="game-stats-item" data-stat-id="morale">Avg Morale: <span id="stat-morale" class="font-bold text-blue-600">75%</span></span></p>
+            </div>
+
+            <!-- ACTIONS MENU MOVED HERE -->
+            <div class="bg-gray-100 p-4 rounded-xl shadow-inner mb-6">
+                <h3 class="text-xl font-semibold text-gray-700 mb-3">Actions 🛠️</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="action-equip-item" class="action-button bg-yellow-600 hover:bg-yellow-700 col-span-2">🎒 Equip Item</button>
+                    <button id="action-advisory" class="action-button bg-blue-500 hover:bg-blue-600 col-span-2">💡 Advisory</button>
+                    <button id="action-next-day" class="action-button col-span-2 bg-green-600 hover:bg-green-700">➡️ Next Day</button>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                    <button id="action-fast-forward" class="save-load-button bg-purple-600 hover:bg-purple-700">⏩ Fast Forward</button>
+                    <button id="action-stop-fast-forward" class="save-load-button bg-red-600 hover:bg-red-700" disabled>⏹️ Stop Fast Forward</button>
+                </div>
+            </div>
+
+            <!-- New buttons to open modals -->
+            <div class="bg-gray-100 p-4 rounded-xl shadow-inner mb-6">
+                <h3 class="text-xl font-semibold text-gray-700 mb-3">Details & Management 📋</h3>
+                <div class="grid grid-cols-1 gap-3">
+                    <button id="open-survivor-modal" class="action-button">🧑‍🤝‍🧑 View Survivors</button>
+                    <button id="action-recruit-survivor" class="action-button">➕ Recruit Survivor</button>
+                    <button id="open-inventory-modal" class="action-button">🎒 View Inventory</button>
+                    <button id="open-research-modal" class="action-button">🔬 View Research</button>
+                    <button id="open-achievements-modal" class="action-button bg-yellow-500 hover:bg-yellow-600">🏆 Achievements</button>
+                </div>
+            </div>
+
+            <div class="bg-gray-100 p-4 rounded-xl shadow-inner">
+                <h3 class="text-xl font-semibold text-gray-700 mb-3">Save/Load 💾</h3>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <button id="save-game" class="save-load-button">Save Game</button>
+                    <button id="load-game" class="save-load-button">Load Game</button>
+                </div>
+                <button id="view-changelog" class="save-load-button w-full">View Changelog 📜</button>
+            </div>
+        </div>
+
+        <div class="game-main">
+            <h3 class="text-xl font-semibold text-gray-700 mb-3 text-center">City Map 🗺️</h3>
+            <div id="game-map" class="map-grid mb-6">
+                <!-- Map blocks will be generated here by JavaScript -->
+            </div>
+
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-xl font-semibold text-gray-700">Message Log 💬</h3>
+                <div class="relative">
+                    <select id="log-filter" class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500">
+                        <option value="all">All Messages</option>
+                        <option value="log-generic">Generic</option>
+                        <option value="log-resource">Resources</option>
+                        <option value="log-action">Actions</option>
+                        <option value="log-event">Events</option>
+                        <option value="log-danger">Danger</option>
+                        <option value="log-research">Research</option>
+                        <option value="log-success">Success</option>
+                        <option value="log-victory">Victory</option>
+                        <option value="log-defeat">Defeat</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div id="message-log" class="message-log">
+                <p>Welcome to Resurgent City! Reclaim the city from the zombies.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Changelog Modal -->
+    <div id="changelog-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold mb-4 text-center text-gray-800">Changelog 📜</h3>
+            <div class="modal-body">
+                <p class="mb-2"><strong>v7.1 - Variable Task Duration & UI Improvements (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Variable Task Duration:**
+                        <ul>
+                            <li>Tasks now take longer based on the distance of the target tile from your fort.</li>
+                            <li>Survivors will show `Days Remaining` for their tasks.</li>
+                            <li>Task effects (resource gain, clearing, building) only apply when `Days Remaining` reaches zero.</li>
+                            <li>'Trade' and 'Assign to Research' are instant actions.</li>
+                        </ul>
+                    </li>
+                    <li>**Survivor Assignment Display:**
+                        <ul>
+                            <li>The map tile modal now lists survivors assigned to that specific tile, along with their remaining task days.</li>
+                            <li>Map tiles now show a small icon (🧑‍🤝‍🧑) and a count if one or more survivors are assigned to them.</li>
+                        </ul>
+                    </li>
+                    <li>**Bug Fix:** Corrected `ReferenceError: getAdjacentRuinedBlocks is not defined` in `advisoryConsult`.</li>
+                </ul>
+                <p class="mb-2"><strong>v7.0 - Exploration & Scout Posts (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Map Exploration System:**
+                        <ul>
+                            <li>Tiles are now either 'explored' (details visible, actionable) or 'unexplored' (hidden details, only 'Expedition' action possible).</li>
+                            <li>Unexplored tiles are visually distinct (darker, 'UNKNOWN' label).</li>
+                            <li>**New Action: 'Expedition'**: Send a survivor to an adjacent unexplored tile to reveal its contents. Costs 5 Food and 5 Materials. Risky (chance of injury, zombie encounter).</li>
+                        </ul>
+                    </li>
+                    <li>**New Building: 'Scout Post'**:
+                        <ul>
+                            <li>Build on a cleared block (Cost: 30 Materials).</li>
+                            <li>Expands your 'influence zone', automatically exploring all tiles within 2 tiles of the Scout Post.</li>
+                        </ul>
+                    </li>
+                    <li>**Expanded Influence Zone**:
+                        <ul>
+                            <li>Actions (Scavenge, Clear, Build, Trade, Attack Faction) can now only be performed on tiles within the 'influence zone' (range of Fort or Scout Posts).</li>
+                            <li>The Fort's influence zone is 1 tile radius. Scout Posts have a 2-tile radius.</li>
+                        </ul>
+                    </li>
+                    <li>**Low Materials Warning**: Now appears only once per day at the start of the day if materials are critically low.</li>
+                </ul>
+                <p class="mb-2"><strong>v6.12 - Group Leader, Clickable Stats & Survivor Info (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Default Group Leader:** Ensured one initial survivor has a combined skill total of at least 5 to serve as a capable group leader.</li>
+                    <li>**Clickable Game Stats:** Added click functionality to all game stats in the sidebar. Clicking a stat will now provide detailed information and tips in the message log.</li>
+                    <li>**Clickable Survivors in Modal:** Clicking a survivor in the "View Survivors" modal now logs detailed information about their status, morale, and last activity to the message log.</li>
+                </ul>
+                <p class="mb-2"><strong>v6.11 - Game Window Scrolling Fix (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Game Window Scrolling Fix:** Enabled scrolling for the main game window by removing global `overflow: hidden` from `body`.</li>
+                    <li>**Dynamic Modal Overlay:** Implemented a new `modal-open` class that is dynamically added to the `body` when any modal is active, ensuring the background content is correctly prevented from scrolling only when a modal is open.</li>
+                </ul>
+                <p class="mb-2"><strong>v6.10 - Modal Positioning Fix (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Modal Positioning Fix:** Ensured modals correctly appear as full-screen, centered pop-ups by setting `html, body` to `width: 100%; height: 100%;` and adding `overflow: hidden;` to `body` to prevent background scrolling.</li>
+                </ul>
+                <p class="mb-2"><strong>v6.9 - Themed UI (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Refined Color Palette:** Implemented a new, cohesive color scheme with darker backgrounds and vibrant accents for a more professional and thematic look.</li>
+                    <li>**Enhanced Shadows & Depth:** Applied stronger and more consistent `box-shadow` effects to panels, modals, and interactive elements, creating a modern, layered UI.</li>
+                    <li>**Subtle Typography Enhancements:** Adjusted font weights and sizes for improved visual hierarchy and readability throughout the game.</li>
+                </ul>
+                <p class="mb-2"><strong>v6.8 - Achievements & Modals (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Achievement System:**
+                        <ul>
+                            <li>New achievements (First Clear, Recruiter, Fort Defender, Master Researcher, City Reclaimer) to track progress and provide goals.</li>
+                            <li>Automatic unlocking with log messages and pop-up notifications.</li>
+                            <li>New "🏆 Achievements" button and modal to view all achievements.</li>
+                        </ul>
+                    </li>
+                    <li>**Sidebar to Modals Conversion:**
+                        <ul>
+                            <li>"Survivors", "Inventory", and "Research" sections are now opened via dedicated buttons in the sidebar.</li>
+                            <li>New modals for "🧑‍🤝‍🧑 View Survivors", "🎒 View Inventory", and "🔬 View Research" provide detailed views.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mb-2"><strong>v6.7 - Research, Advisory & UI Refinements (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Revised Research System:**
+                        <ul>
+                            <li>Survivors must now be assigned to a Laboratory to generate Research Points.</li>
+                            <li>Daily Research Point generation scales with the assigned survivor's Building skill.</li>
+                        </ul>
+                    </li>
+                    <li>**Advisory/Consultancy Feature:**
+                        <ul>
+                            <li>New "💡 Advisory" button in the Actions menu.</li>
+                            <li>Costs one available survivor for the day.</li>
+                            <li>Only survivors with a combined skill total of 5 or more can be consulted.</li>
+                            <li>Provides contextual hints/options in the message log, once per day.</li>
+                        </ul>
+                    </li>
+                    <li>**UI Reorganization:** The "Actions" menu has been moved directly under "Game Stats".</li>
+                    <li>**Fort Defense Limit:** Maximum Fort Defense capped at 50.</li>
+                </ul>
+                <p class="mb-2"><strong>v6.6 - Streamlined UI & Warnings (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Streamlined Actions Menu:** Most task-specific action buttons (Scavenge, Clear, Build, Trade, Attack) have been removed from the main sidebar. These actions are now exclusively initiated by clicking on a map tile.</li>
+                    <li>**"Equip Item" Button Update:** The "Equip Item" button remains in the main Actions menu and now directly opens a multi-stage modal to select a survivor and an item to equip/unequip.</li>
+                    <li>**Pop-up Warnings:**
+                        <ul>
+                            <li>**Low Resources:** Critical low food/materials now trigger a pop-up warning.</li>
+                            <li>**Danger Events:** Zombie attacks and survivor losses/injuries now trigger pop-up warnings.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mb-2"><strong>v6.5 - Improved Task Workflow (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**New Task Assignment Flow:** Clicking a map tile now opens a modal. This modal displays details about the clicked tile, available actions for that tile, and a list of available survivors. You select both the action and the survivor within this single modal to assign a task.</li>
+                    <li>**Removed Survivor Details Modal:** The separate survivor details modal is no longer used for assigning tasks. It can still be re-implemented if needed for viewing survivor stats.</li>
+                </ul>
+                <p class="mb-2"><strong>v6.4 - No Tile Info Log on Click (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Removed Tile Info Log:** Clicking on a map tile will no longer log its detailed information to the message log. Tile information is still available via tooltips.</li>
+                </ul>
+                <p class="mb-2"><strong>v6.3 - Clear Task Fix (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Clear Task Typo Fix:** Corrected a typo in the `performAction` function for the 'clear' task that was preventing it from executing successfully. Now, clearing blocks should work as intended.</li>
+                </ul>
+                <p class="mb-2"><strong>v6.2 - No Block Info Pop-up (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Block Info in Log:** The block information pop-up modal has been removed. Block details are now displayed directly in the game message log when a block is clicked without a pending task, or when a task cannot be performed on the selected block.</li>
+                </ul>
+                <p class="mb-2"><strong>v6.1 - Task Assignment Fix (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Task Assignment Flow Fix:** Resolved issue where clicking a map block for a pending task would only show block details. Now, clicking a block after selecting a survivor and task will attempt to perform the task. Block details will only show if no task is pending or if the task cannot be performed on the selected block.</li>
+                </ul>
+                <p class="mb-2"><strong>v6.0 - Quality of Life Update (July 25, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Task Assignment UI:** Clicking a survivor opens a modal with their details and available actions. Actions requiring a block will then prompt for map selection.</li>
+                    <li>**Detailed Survivor Info:** Survivor modal displays comprehensive stats (health, morale, skills, trait, equipped item, current task).</li>
+                    <li>**Tooltip Information:** Map blocks and action buttons now have descriptive tooltips to provide more context.</li>
+                    <li>**Resource Threshold Warnings:** Food and Materials stats turn red when critically low.</li>
+                    <li>**Faster Day Progression:** Added 'Fast Forward' and 'Stop Fast Forward' buttons to automate day progression.</li>
+                </ul>
+                <p class="mb-2"><strong>v5.0 - Deeper Management (July 24, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Individual Survivor Morale & Health:**
+                        <ul>
+                            <li>Survivors now have individual `health` (0-100) and `morale` (0-100) stats.</li>
+                            <li>Health: Influenced by attacks, hunger, illness. Low health (`< 50`) means "sick" (cannot perform tasks).</li>
+                            <li>Morale: Influenced by food, housing, traits, and events. Affects task efficiency and risk of leaving.</li>
+                            <li>Survivor list displays individual health and morale.</li>
+                        </ul>
+                    </li>
+                    <li>**Deeper Faction System (Reputation & Interaction):**
+                        <ul>
+                            <li>Factions have a `reputation` score (0-100).</li>
+                            <li>**Trade with Nomads:** Dynamic offers, better rates with higher reputation.</li>
+                            <li>**Attack Marauders:** Risky action; success and reputation changes influenced by survivor skills and Marauder reputation.</li>
+                            <li>New random events with choices affecting faction reputation.</li>
+                        </ul>
+                    </li>
+                    <li>**Basic Equipment System (Enhanced):**
+                        <ul>
+                            <li>Scavenging can yield equipment items.</li>
+                            <li>New 'Equip Item' action to assign items to individual survivors (providing skill/defense bonuses).</li>
+                            <li>Survivor list shows equipped items.</li>
+                        </ul>
+                    </li>
+                    <li>**More Complex Random Events with Choices:** Events now pop up a modal requiring player decisions with varied outcomes.</li>
+                </ul>
+                <p class="mb-2"><strong>v4.0 - Deeper Management (July 24, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Survivor Morale System:**
+                        <ul>
+                            <li>New 'Morale' stat in game stats.</li>
+                            <li>Morale influenced by food, housing, and events.</li>
+                            <li>Low morale can impact task efficiency; high morale can boost it.</li>
+                            <li>'Optimistic' trait now affects morale.</li>
+                        </ul>
+                    </li>
+                    <li>**Basic Faction Interaction:**
+                        <ul>
+                            <li>**Trade:** New 'Trade' action button when selecting Nomad-controlled blocks. Exchange Food for Materials.</li>
+                            <li>**Attack Faction Block:** New 'Attack Faction' action button when selecting Marauder-controlled blocks. Risky, but can clear zombies and yield resources.</li>
+                            <li>New random events with choices that affect faction relations.</li>
+                        </ul>
+                    </li>
+                    <li>**Basic Equipment System:**
+                        <ul>
+                            <li>**Scavenging:** Chance to find equipment items (e.g., Makeshift Tools, Crude Armor).</li>
+                            <li>**Equip Item:** New action button to assign available equipment to selected survivors.</li>
+                            <li>Equipped items provide skill bonuses.</li>
+                            <li>Survivor list now displays equipped items.</li>
+                        </ul>
+                    </li>
+                    <li>**More Complex Random Events with Choices:** Events now pop up a modal requiring player decisions with varied outcomes.</li>
+                </ul>
+                <p class="mb-2"><strong>v3.0 - Strategic Depth (July 24, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Individual Survivors with Traits:** Manage unique survivors with names, individual skill levels (Scavenging, Clearing, Building), and random traits (e.g., "Strong," "Quick Learner," "Clumsy"). Task outcomes are influenced by survivor skills/traits.</li>
+                    <li>**Advanced Research Tree (Light):**
+                        <ul>
+                            <li>Build a **Laboratory** 🧪 on cleared blocks (25 materials) to generate Research Points.</li>
+                            <li>Spend Research Points to unlock technologies like "Improved Tools" (+2 bonus to Scavenging/Building) and "Better Defenses" (+5 Fort Defense).</li>
+                        </ul>
+                    </li>
+                    <li>**Rival Groups (Light):** Factions now occupy ruined blocks and can trigger basic events (e.g., demands, trade offers). Faction-controlled blocks are visually distinct.</li>
+                    <li>**Expanded Fort Defense:** Build **Watchtowers** 🗼 on cleared blocks (20 materials) to permanently increase Fort Defense.</li>
+                    <li>**Updated UI:**
+                        <ul>
+                            <li>Sidebar now lists individual survivors with their stats and traits.</li>
+                            <li>New "Research" panel to manage tech unlocks.</li>
+                            <li>Map blocks show faction control.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="mb-2"><strong>v2.0 - Core Enhancements (July 24, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>**Robust Persistence:** Game state now saved and loaded using IndexedDB.</li>
+                    <li>**Light Survivor Specialization:** Survivors gain Scavenging, Clearing, and Building skills by performing actions, providing bonuses to those tasks. Skill levels displayed in stats.</li>
+                    <li>**Expanded Building Types:**
+                        <ul>
+                            <li>**Housing:** Build on cleared blocks (20 materials) to increase max survivor capacity.</li>
+                            <li>**Workshop:** Build on cleared blocks (15 materials) to generate daily materials.</li>
+                            <li>**Laboratory:** Build on cleared blocks (25 materials) to generate Research Points.</li>
+                        </ul>
+                    </li>
+                    <li>**Basic Random Events:** Simple text-based random events can now occur each day.</li>
+                    <li>**Updated UI:** Game title is now "Resurgent City v2.0". Stats panel includes new skill levels and materials production.</li>
+                </ul>
+                <p class="mb-2"><strong>v1.1 - UI Improvements (July 24, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>Action buttons now visually highlight when available for the selected block.</li>
+                    <li>Added a scrollable Changelog pop-up modal for game updates.</li>
+                </ul>
+                <p class="mb-2"><strong>v1.0 (MVP) - Initial Release (July 24, 2025)</strong></p>
+                <ul class="list-disc ml-5 mb-4">
+                    <li>Core game loop: Scavenging, Clearing, Building/Repairing.</li>
+                    <li>Basic resource management (Food, Materials, Survivors, Fort Defense).</li>
+                    <li>Turn-based progression with daily consumption and simplified zombie attacks.</li>
+                    <li>Local storage save/load functionality.</li>
+                    <li>Simple text-based map and message log.</li>
+                    <li>Victory/Defeat conditions.</li>
+                </ul>
+            </div>
+            <button id="close-changelog-modal" class="action-button mt-4 w-full">Close</button>
+        </div>
+    </div>
+
+    <!-- Event Choice Modal -->
+    <div id="event-choice-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="event-choice-title" class="text-2xl font-bold mb-4 text-center text-gray-800">Event!</h3>
+            <p id="event-choice-text" class="text-base text-gray-700 mb-4"></p>
+            <div id="event-choice-buttons" class="modal-buttons">
+                <!-- Buttons will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade Modal -->
+    <div id="trade-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold mb-4 text-center text-gray-800">Trade with The Nomads 🤝</h3>
+            <p class="text-base text-gray-700 mb-4">What would you like to trade?</p>
+            <div class="modal-body">
+                <p class="mb-2">Your Food: <span id="trade-your-food" class="font-bold"></span> 🍎 | Your Materials: <span id="trade-your-materials" class="font-bold"></span> 🧱</p>
+                <p class="text-sm text-gray-600 mb-4">Nomad Reputation: <span id="nomad-reputation" class="font-bold"></span></p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Buy Materials</h4>
+                        <button id="trade-buy-materials" class="action-button w-full mb-2"></button>
+                        <button id="trade-buy-materials-large" class="action-button w-full"></button>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-2">Buy Food</h4>
+                        <button id="trade-buy-food" class="action-button w-full mb-2"></button>
+                        <button id="trade-buy-food-large" class="action-button w-full"></button>
+                    </div>
+                </div>
+            </div>
+            <button id="close-trade-modal" class="action-button mt-4 w-full">Close</button>
+        </div>
+    </div>
+
+    <!-- Equip Item Modal -->
+    <div id="equip-item-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="equip-modal-title" class="text-2xl font-bold mb-4 text-center text-gray-800">Equip Item 🎒</h3>
+            <p id="equip-modal-instruction" class="text-base text-gray-700 mb-4">Select a survivor to equip an item:</p>
+            <div id="equip-item-list" class="modal-body">
+                <!-- Survivors or items will be listed here -->
+            </div>
+            <button id="close-equip-modal" class="action-button mt-4 w-full">Close</button>
+        </div>
+    </div>
+
+    <!-- Block Action & Survivor Selection Modal (NEW) -->
+    <div id="block-action-survivor-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="block-action-modal-title" class="text-2xl font-bold mb-4 text-center text-gray-800">Block [X, Y] Details & Actions</h3>
+            <div class="modal-body">
+                <div id="block-action-modal-details" class="bg-gray-100 p-3 rounded-lg mb-4 text-sm text-gray-700">
+                    <!-- Block details will be populated here -->
+                </div>
+
+                <h4 class="text-xl font-semibold text-gray-700 mb-3">Actions for this Block 🛠️</h4>
+                <div id="block-action-modal-actions" class="grid grid-cols-2 gap-2 mb-4">
+                    <!-- Action buttons will be dynamically added here -->
+                </div>
+
+                <h4 class="text-xl font-semibold text-gray-700 mb-3">Assigned Survivors 🧑‍🤝‍🧑</h4>
+                <div id="block-action-modal-assigned-survivors" class="max-h-20 overflow-y-auto mb-4 text-sm text-gray-700">
+                    <!-- Assigned survivors will be listed here -->
+                </div>
+
+                <h4 class="text-xl font-semibold text-gray-700 mb-3">Available Survivors 🧑‍🤝‍🧑</h4>
+                <div id="block-action-modal-available-survivors" class="max-h-40 overflow-y-auto mb-4">
+                    <!-- Available survivors will be listed here -->
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button id="block-action-modal-perform" class="action-button" disabled>Perform Task</button>
+                <button id="block-action-modal-cancel" class="save-load-button bg-gray-500 hover:bg-gray-600">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Warning Modal (NEW) -->
+    <div id="warning-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="warning-modal-title" class="text-2xl font-bold mb-4 text-center text-gray-800">Warning!</h3>
+            <p id="warning-modal-text" class="text-base text-gray-700 mb-4"></p>
+            <button id="close-warning-modal" class="action-button mt-4 w-full">OK</button>
+        </div>
+    </div>
+
+    <!-- Survivor List Modal (NEW) -->
+    <div id="survivor-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold mb-4 text-center text-gray-800">Your Survivors 🧑‍🤝‍🧑</h3>
+            <div id="survivor-modal-list" class="modal-body">
+                <!-- Survivor items will be rendered here -->
+            </div>
+            <button id="close-survivor-modal" class="action-button mt-4 w-full">Close</button>
+        </div>
+    </div>
+
+    <!-- Inventory Modal (NEW) -->
+    <div id="inventory-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold mb-4 text-center text-gray-800">Your Inventory 🎒</h3>
+            <div id="inventory-modal-list" class="modal-body text-sm text-gray-700">
+                <!-- Inventory items will be rendered here -->
+            </div>
+            <button id="close-inventory-modal" class="action-button mt-4 w-full">Close</button>
+        </div>
+    </div>
+
+    <!-- Research Modal (NEW) -->
+    <div id="research-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold mb-4 text-center text-gray-800">Research Lab 🔬</h3>
+            <p class="text-sm mb-2">Current Research Points: <span id="research-modal-points" class="font-bold text-purple-700">0</span></p>
+            <div id="research-modal-list" class="modal-body">
+                <!-- Research items will be rendered here -->
+            </div>
+            <button id="close-research-modal" class="action-button mt-4 w-full">Close</button>
+        </div>
+    </div>
+
+    <!-- Achievements Modal (NEW) -->
+    <div id="achievements-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold mb-4 text-center text-gray-800">Achievements 🏆</h3>
+            <div id="achievements-modal-list" class="modal-body">
+                <!-- Achievements will be rendered here -->
+            </div>
+            <button id="close-achievements-modal" class="action-button mt-4 w-full">Close</button>
+        </div>
+    </div>
+
+    <!-- ES Module imports for JavaScript -->
+    <script type="module" src="js/data.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/persistence.js"></script>
+    <script type="module" src="js/modals.js"></script>
+    <script type="module" src="js/uiUpdates.js"></script>
+    <script type="module" src="js/gameLogic.js"></script>
+    <script type="module" src="js/game.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
